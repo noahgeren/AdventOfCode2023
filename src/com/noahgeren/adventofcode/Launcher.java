@@ -4,7 +4,7 @@ public class Launcher {
 
 	private static final String PACKAGE = "xxiii";
 	private static final int YEAR = 2023;
-	private static final int DAY = 4;
+	private static final int DAY = 5;
 	
 	public static void main(String[] args) {
 		try {
@@ -12,6 +12,12 @@ public class Launcher {
 					String.format("com.noahgeren.adventofcode.problems.%s.Day%02d", PACKAGE, DAY)).newInstance();
 			loadResources(day);
 			runPartOfDay(day, true);
+			try {
+				day.reset();
+			} catch (Exception e) {
+				System.out.printf("Error resetting class for day %d of %d\n", DAY, YEAR);
+				e.printStackTrace();
+			}
 			runPartOfDay(day, false);
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 			System.out.printf("Error loading class for day %d of %d\n", DAY, YEAR);
