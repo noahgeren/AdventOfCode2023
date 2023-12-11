@@ -8,7 +8,7 @@ import com.noahgeren.adventofcode.data.DataLoader;
 
 public class Day11 extends Day {
 
-	List<List<Character>> image = new ArrayList<>();
+	char[][] image;
 	List<Integer> emptyRows = new ArrayList<>();
 	List<Integer> emptyCols = new ArrayList<>();
 	List<Coordinate> galaxies = new ArrayList<>();
@@ -16,12 +16,9 @@ public class Day11 extends Day {
 	@Override
 	public void loadResources() throws Exception {
 		List<String> lines = DataLoader.readLines("day11.txt");
-		for (String line : lines) {
-			List<Character> row = new ArrayList<>();
-			for (char c : line.toCharArray()) {
-				row.add(c);
-			}
-			image.add(row);
+		image = new char[lines.size()][];
+		for(int i = 0; i < image.length; i++) {
+			image[i] = lines.get(i).toCharArray();
 		}
 	}
 
@@ -29,9 +26,9 @@ public class Day11 extends Day {
 	public String solve(boolean firstPart) throws Exception {
 		if(firstPart) {
 			findEmptyRowsAndColumns();
-			for (int row = 0; row < image.size(); row++) {
-				for (int col = 0; col < image.get(row).size(); col++) {
-					if (image.get(row).get(col) == '#') {
+			for (int row = 0; row < image.length; row++) {
+				for (int col = 0; col < image[row].length; col++) {
+					if (image[row][col] == '#') {
 						galaxies.add(new Coordinate(row, col));
 					}
 				}
@@ -50,9 +47,9 @@ public class Day11 extends Day {
 	
 	private void findEmptyRowsAndColumns() {
 		emptyRows = new ArrayList<>();
-		for (int row = 0; row < image.size(); row++) {
+		for (int row = 0; row < image.length; row++) {
 			boolean empty = true;
-			for (char c : image.get(row)) {
+			for (char c : image[row]) {
 				if (c != '.') {
 					empty = false;
 				}
@@ -62,10 +59,10 @@ public class Day11 extends Day {
 			}
 		}
 		emptyCols = new ArrayList<>();
-		for (int col = 0; col < image.get(0).size(); col++) {
+		for (int col = 0; col < image[0].length; col++) {
 			boolean empty = true;
-			for (int row = 0; row < image.size(); row++) {
-				if (image.get(row).get(col) != '.') {
+			for (int row = 0; row < image.length; row++) {
+				if (image[row][col] != '.') {
 					empty = false;
 				}
 			}
