@@ -60,7 +60,7 @@ public class Day08 extends Day {
 				try {
 					while (true) {
 						if (steps > currentBillions * 1_000_000_000L) {
-							System.out.println(currentBillions * 1_000_000_000L);
+							System.out.println(currentBillions + " billion");
 							currentBillions++;
 							System.out.println((System.currentTimeMillis() - start) / 1000 + " seconds");
 						}
