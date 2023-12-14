@@ -2,8 +2,9 @@ package com.noahgeren.adventofcode.problems.xxiii;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import com.noahgeren.adventofcode.Day;
 import com.noahgeren.adventofcode.data.DataLoader;
@@ -11,20 +12,16 @@ import com.noahgeren.adventofcode.data.DataLoader;
 public class Day12 extends Day {
 
 	private final int DUPLICATE = 5;
-	private final int MAX = 15;
 
 	char[][] arrangements;
 	int[][] counts;
-	BigInteger[][] arrangementCounts;
+	Map<String, BigInteger> cache = new HashMap<>();
 
 	@Override
 	public void loadResources() throws Exception {
 		List<String> linesTemp = DataLoader.readLines("day12.txt");
 		arrangements = new char[linesTemp.size()][];
 		counts = new int[linesTemp.size()][];
-		if(arrangementCounts == null) {
-			arrangementCounts = new BigInteger[arrangements.length][];
-		}
 		for (int i = 0; i < linesTemp.size(); i++) {
 			String[] line = linesTemp.get(i).split(" ");
 			arrangements[i] = line[0].toCharArray();
@@ -33,74 +30,66 @@ public class Day12 extends Day {
 			for (int j = 0; j < strCounts.length; j++) {
 				counts[i][j] = Integer.valueOf(strCounts[j]);
 			}
-			if(arrangementCounts[i] == null) {
-				arrangementCounts[i] = new BigInteger[DUPLICATE];
-			}
 		}
 	}
 
 	@Override
 	public String solve(boolean firstPart) throws Exception {
-		for(int i = 1; i <= DUPLICATE; i++) {
-			loadResources();
-			findForDuplicate(i);
-		}
-		for(int i = 0; i < arrangementCounts.length && i < MAX; i++) {
-			for(int j = 0; j < arrangementCounts[i].length; j++) {
-				System.out.print(arrangementCounts[i][j] + " ");
-			}
-			System.out.println();
-		}
-		return null;
-	}
-	
-	private void findForDuplicate(int duplicate) {
-		char[][] newArrangements = new char[arrangements.length][];
-		for (int i = 0; i < arrangements.length; i++) {
-			List<Character> line = new ArrayList<>();
-			for (int k = 0; k < duplicate; k++) {
-				for (int j = 0; j < arrangements[i].length; j++) {
-					line.add(arrangements[i][j]);
+		if (!firstPart) {
+			char[][] newArrangements = new char[arrangements.length][];
+			for (int i = 0; i < arrangements.length; i++) {
+				List<Character> line = new ArrayList<>();
+				for (int k = 0; k < DUPLICATE; k++) {
+					for (int j = 0; j < arrangements[i].length; j++) {
+						line.add(arrangements[i][j]);
+					}
+					if (k != DUPLICATE - 1) {
+						line.add('?');
+					}
 				}
-				if (k != duplicate - 1) {
-					line.add('?');
+				newArrangements[i] = new char[line.size()];
+				for (int j = 0; j < line.size(); j++) {
+					newArrangements[i][j] = line.get(j);
 				}
 			}
-			newArrangements[i] = new char[line.size()];
-			for (int j = 0; j < line.size(); j++) {
-				newArrangements[i][j] = line.get(j);
-			}
-		}
-		arrangements = newArrangements;
+			arrangements = newArrangements;
 
-		int[][] newCounts = new int[counts.length][];
-		for (int i = 0; i < counts.length; i++) {
-			List<Integer> line = new ArrayList<>();
-			for (int k = 0; k < duplicate; k++) {
-				for (int j = 0; j < counts[i].length; j++) {
-					line.add(counts[i][j]);
+			int[][] newCounts = new int[counts.length][];
+			for (int i = 0; i < counts.length; i++) {
+				List<Integer> line = new ArrayList<>();
+				for (int k = 0; k < DUPLICATE; k++) {
+					for (int j = 0; j < counts[i].length; j++) {
+						line.add(counts[i][j]);
+					}
+				}
+				newCounts[i] = new int[line.size()];
+				for (int j = 0; j < line.size(); j++) {
+					newCounts[i][j] = line.get(j);
 				}
 			}
-			newCounts[i] = new int[line.size()];
-			for (int j = 0; j < line.size(); j++) {
-				newCounts[i][j] = line.get(j);
-			}
+			counts = newCounts;
 		}
-		counts = newCounts;
-		
+
 		BigInteger totalArrangements = BigInteger.ZERO;
-		for (int i = 0; i < arrangements.length && i < MAX; i++) {
-			System.out.println(duplicate + " " + (i + 1) + "/" + arrangements.length);
+		for (int i = 0; i < arrangements.length; i++) {
+			System.out.print((i + 1) + "/" + arrangements.length + ": ");
 			BigInteger count = countArrangements(arrangements[i], counts[i], 0);
-			arrangementCounts[i][duplicate - 1] = count;
 			totalArrangements = totalArrangements.add(count);
+			System.out.println(count);
+			cache.clear();
 		}
+		return String.valueOf(totalArrangements);
 	}
 
 	private BigInteger countArrangements(char[] arr, int[] counts, int index) {
+		String hash = hash(arr, counts, index);
+		if (cache.containsKey(hash)) {
+			return cache.get(hash);
+		}
 		if (index >= arr.length) {
 			return checkValidUpTo(arr, counts, index) ? BigInteger.ONE : BigInteger.ZERO;
 		}
+		BigInteger answer;
 		if (arr[index] == '?') {
 			arr[index] = '#';
 			BigInteger filled = countArrangements(arr, counts, index + 1);
@@ -110,14 +99,30 @@ public class Day12 extends Day {
 				notFilled = countArrangements(arr, counts, index + 1);
 			}
 			arr[index] = '?';
-			return filled.add(notFilled);
+			answer = filled.add(notFilled);
 		} else if (arr[index] == '.' && !checkValidUpTo(arr, counts, index)) {
-			return BigInteger.ZERO;
+			answer = BigInteger.ZERO;
+		} else {
+			answer = countArrangements(arr, counts, index + 1);
 		}
-		return countArrangements(arr, counts, index + 1);
+		cache.put(hash, answer);
+		return answer;
 	}
 
 	private boolean checkValidUpTo(char[] arr, int[] counts, int bound) {
+		List<Integer> countCheck = getCountCheck(arr, counts, bound);
+		if (countCheck.size() > counts.length || (bound >= arr.length - 1 && countCheck.size() != counts.length)) {
+			return false;
+		}
+		for (int i = 0; i < countCheck.size(); i++) {
+			if (counts[i] != countCheck.get(i)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private List<Integer> getCountCheck(char[] arr, int[] counts, int bound) {
 		List<Integer> countCheck = new ArrayList<>();
 		countCheck.add(0);
 		for (int i = 0; i < arr.length && i < bound; i++) {
@@ -131,26 +136,20 @@ public class Day12 extends Day {
 		if (countCheck.get(countCheck.size() - 1) == 0) {
 			countCheck.remove(countCheck.size() - 1);
 		}
-		if (countCheck.size() > counts.length || (bound >= arr.length - 1 && countCheck.size() != counts.length)) {
-//			printData(arr, countCheck);
-			return false;
-		}
-		for (int i = 0; i < countCheck.size(); i++) {
-			if (counts[i] != countCheck.get(i)) {
-//				System.out.println("bound " + bound);
-//				printData(arr, countCheck);
-				return false;
-			}
-		}
-		return true;
+		return countCheck;
 	}
 
-	private void printData(char[] arr, List<Integer> countCheck) {
-		for (char c : arr) {
-			System.out.print(c);
+	private String hash(char[] arr, int[] counts, int bound) {
+		StringBuilder hash = new StringBuilder();
+		for (int i = Math.max(bound - 1, 0); i < arr.length; i++) {
+			hash.append(arr[i]);
 		}
-		System.out.println();
-		System.out.println(countCheck.stream().map(String::valueOf).collect(Collectors.joining(", ")));
+		List<Integer> countCheck = getCountCheck(arr, counts, bound);
+		for (int c : countCheck) {
+			hash.append(c);
+			hash.append(',');
+		}
+		return hash.toString();
 	}
 
 }
