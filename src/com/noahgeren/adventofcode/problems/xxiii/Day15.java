@@ -1,6 +1,5 @@
 package com.noahgeren.adventofcode.problems.xxiii;
 
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
@@ -9,7 +8,7 @@ import com.noahgeren.adventofcode.Day;
 import com.noahgeren.adventofcode.data.DataLoader;
 
 public class Day15 extends Day {
-	
+
 	private String[] sequence;
 
 	@Override
@@ -19,25 +18,25 @@ public class Day15 extends Day {
 
 	@Override
 	public String solve(boolean firstPart) throws Exception {
-		if(firstPart) {
+		if (firstPart) {
 			return solveFirstPart();
 		}
 		return solveSecondPart();
 	}
-	
+
 	private String solveFirstPart() {
 		long sum = 0;
-		for(String str : sequence) {
+		for (String str : sequence) {
 			sum += hash(str);
 		}
 		return String.valueOf(sum);
 	}
-	
+
 	private String solveSecondPart() {
-		BigInteger sum = BigInteger.ZERO;
+		long sum = 0;
 		HashMap<Long, LinkedHashMap<String, Long>> map = new HashMap<>();
-		for(String str : sequence) {
-			if(str.endsWith("-")) {
+		for (String str : sequence) {
+			if (str.endsWith("-")) {
 				String label = str.substring(0, str.length() - 1);
 				long hash = hash(label);
 				map.computeIfAbsent(hash, (x) -> new LinkedHashMap<String, Long>()).remove(label);
@@ -48,21 +47,21 @@ public class Day15 extends Day {
 				map.computeIfAbsent(hash, (x) -> new LinkedHashMap<String, Long>()).put(label, focalLength);
 			}
 		}
-		for(Entry<Long, LinkedHashMap<String, Long>> entry : map.entrySet()) {
-			BigInteger box = BigInteger.valueOf(entry.getKey() + 1);
+		for (Entry<Long, LinkedHashMap<String, Long>> entry : map.entrySet()) {
+			long box = entry.getKey() + 1;
 			LinkedHashMap<String, Long> contents = entry.getValue();
-			BigInteger i = BigInteger.ONE;
-			for(Long focalLength : contents.values()) {
-				sum = sum.add(box.multiply(i).multiply(BigInteger.valueOf(focalLength)));
-				i = i.add(BigInteger.ONE);
+			long i = 1;
+			for (Long focalLength : contents.values()) {
+				sum += box * i * focalLength;
+				i++;
 			}
 		}
-		return sum.toString();
+		return String.valueOf(sum);
 	}
-	
+
 	private long hash(String str) {
 		long hash = 0;
-		for(char c : str.toCharArray()) {
+		for (char c : str.toCharArray()) {
 			hash += c;
 			hash *= 17;
 			hash %= 256;
