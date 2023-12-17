@@ -99,44 +99,32 @@ public class Day16 extends Day {
 		Direction newDirection = getNewDirection(cell, direction);
 		switch (cell) {
 		case '.':
-			runSimulation(getNextCoord(coord, direction), direction, seen, energy);
+			runSimulation(direction.getNextCoord(coord), direction, seen, energy);
 			break;
 		case '/':
-			runSimulation(getNextCoord(coord, newDirection), newDirection, seen, energy);
+			runSimulation(newDirection.getNextCoord(coord), newDirection, seen, energy);
 			break;
 		case '\\':
-			runSimulation(getNextCoord(coord, newDirection), newDirection, seen, energy);
+			runSimulation(newDirection.getNextCoord(coord), newDirection, seen, energy);
 			break;
 		case '|':
 			if (direction == Direction.UP || direction == Direction.DOWN) {
-				runSimulation(getNextCoord(coord, direction), direction, seen, energy);
+				runSimulation(direction.getNextCoord(coord), direction, seen, energy);
 			} else {
-				runSimulation(getNextCoord(coord, Direction.UP), Direction.UP, seen, energy);
-				runSimulation(getNextCoord(coord, Direction.DOWN), Direction.DOWN, seen, energy);
+				runSimulation(Direction.UP.getNextCoord(coord), Direction.UP, seen, energy);
+				runSimulation(Direction.DOWN.getNextCoord(coord), Direction.DOWN, seen, energy);
 			}
 			break;
 		case '-':
 			if (direction == Direction.LEFT || direction == Direction.RIGHT) {
-				runSimulation(getNextCoord(coord, direction), direction, seen, energy);
+				runSimulation(direction.getNextCoord(coord), direction, seen, energy);
 			} else {
-				runSimulation(getNextCoord(coord, Direction.LEFT), Direction.LEFT, seen, energy);
-				runSimulation(getNextCoord(coord, Direction.RIGHT), Direction.RIGHT, seen, energy);
+				runSimulation(Direction.LEFT.getNextCoord(coord), Direction.LEFT, seen, energy);
+				runSimulation(Direction.RIGHT.getNextCoord(coord), Direction.RIGHT, seen, energy);
 			}
 			break;
 		}
 		return energy;
-	}
-
-	private int[] getNextCoord(int[] startingCoord, Direction direction) {
-		switch (direction) {
-		case LEFT:
-		case RIGHT:
-			return new int[] { startingCoord[0], startingCoord[1] + (direction == Direction.LEFT ? -1 : 1) };
-		case UP:
-		case DOWN:
-			return new int[] { startingCoord[0] + (direction == Direction.UP ? -1 : 1), startingCoord[1] };
-		}
-		return null;
 	}
 
 	private Direction getNewDirection(char cell, Direction direction) {
