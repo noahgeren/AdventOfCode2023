@@ -4,7 +4,7 @@ public class Launcher {
 
 	private static final String PACKAGE = "xxiii";
 	private static final int YEAR = 2023;
-	private static final int DAY = 15;
+	private static final int DAY = 16;
 	
 	public static void main(String[] args) {
 		try {
