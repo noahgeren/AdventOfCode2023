@@ -7,6 +7,7 @@ import java.util.Set;
 
 import com.noahgeren.adventofcode.Day;
 import com.noahgeren.adventofcode.data.DataLoader;
+import com.noahgeren.adventofcode.util.Direction;
 
 public class Day16 extends Day {
 
@@ -174,10 +175,6 @@ public class Day16 extends Day {
 			return Direction.DOWN;
 		}
 		return null;
-	}
-
-	private static enum Direction {
-		LEFT, RIGHT, UP, DOWN;
 	}
 
 	private static class DirectionalCell {
