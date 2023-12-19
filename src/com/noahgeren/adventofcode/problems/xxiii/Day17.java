@@ -34,6 +34,7 @@ public class Day17 extends Day {
 
 	@Override
 	public String solve(boolean firstPart) throws Exception {
+		// TODO: Switch to Dijkstra's algorithm
 		return String.valueOf(findShortestPath(new int[] { 0, 0 }, new HashSet<>(), Direction.RIGHT, 0) - grid[0][0]);
 	}
 
