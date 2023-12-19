@@ -18,7 +18,7 @@ public class Launcher {
 				System.out.printf("Error resetting class for day %d of %d\n", DAY, YEAR);
 				e.printStackTrace();
 			}
-//			runPartOfDay(day, false);
+			runPartOfDay(day, false);
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 			System.out.printf("Error loading class for day %d of %d\n", DAY, YEAR);
 			e.printStackTrace();

@@ -1,17 +1,17 @@
 package com.noahgeren.adventofcode.problems.xxiii;
 
-import java.util.HashSet;
+import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.noahgeren.adventofcode.Day;
 import com.noahgeren.adventofcode.data.DataLoader;
-import com.noahgeren.adventofcode.util.Coordinate;
 import com.noahgeren.adventofcode.util.Direction;
 
 public class Day18 extends Day {
 
 	List<String> lines;
+	List<Step> steps;
 
 	@Override
 	public void loadResources() throws Exception {
@@ -20,75 +20,90 @@ public class Day18 extends Day {
 
 	@Override
 	public String solve(boolean firstPart) throws Exception {
-		Set<Coordinate> trench = new HashSet<>();
-		Coordinate currentCoord = new Coordinate(0, 0);
-		trench.add(currentCoord);
-		for (String line : lines) {
+		steps = lines.stream().map(line -> new Step(line, firstPart)).collect(Collectors.toList());
+		BigInteger volume = BigInteger.ONE;
+		BigInteger column = findStartingColumn().add(BigInteger.ONE);
+		for (Step step : steps) {
+			BigInteger value;
+			switch (step.direction) {
+			case LEFT:
+				column = column.subtract(step.amount);
+				break;
+			case RIGHT:
+				value = step.amount;
+//				System.out.println("Adding " + value);
+				volume = volume.add(value);
+				column = column.add(step.amount);
+				break;
+			case DOWN:
+				value = column.multiply(step.amount);
+//				System.out.println("Adding " + value);
+				volume = volume.add(value);
+				break;
+			case UP:
+				value = column.subtract(BigInteger.ONE).multiply(step.amount);
+//				System.out.println("Subtracting " + value);
+				volume = volume.subtract(value);
+				break;
+			}
+		}
+		return volume.toString();
+	}
+
+	public BigInteger findStartingColumn() {
+		BigInteger column = BigInteger.ZERO;
+		BigInteger min = BigInteger.valueOf(Long.MAX_VALUE);
+		for (Step step : steps) {
+			if (step.direction == Direction.RIGHT) {
+				column = column.add(step.amount);
+			} else if (step.direction == Direction.LEFT) {
+				column = column.subtract(step.amount);
+			}
+			if (column.compareTo(min) < 0) {
+				min = column;
+			}
+		}
+		return min.abs();
+	}
+
+	private static class Step {
+		Direction direction;
+		BigInteger amount;
+
+		public Step(String line, boolean firstPart) {
 			String[] tokens = line.split(" ");
-			Direction direction = getDirection(tokens[0]);
-			int times = Integer.valueOf(tokens[1]);
-			for (int i = 0; i < times; i++) {
-				currentCoord = currentCoord.getNextCoord(direction);
-				trench.add(currentCoord);
+			if (firstPart) {
+				direction = getDirection(tokens[0]);
+				amount = new BigInteger(tokens[1]);
+			} else {
+				direction = getDirection(tokens[2].charAt(tokens[2].length() - 2));
+				amount = BigInteger.valueOf(Long.parseLong(tokens[2].substring(2, tokens[2].length() - 2), 16));
 			}
 		}
-		long maxRow = Long.MIN_VALUE, minRow = Long.MAX_VALUE;
-		long maxCol = Long.MIN_VALUE, minCol = Long.MAX_VALUE;
-		for (Coordinate coord : trench) {
-			if (coord.row > maxRow) {
-				maxRow = coord.row;
-			}
-			if (coord.row < minRow) {
-				minRow = coord.row;
-			}
-			if (coord.col > maxCol) {
-				maxCol = coord.col;
-			}
-			if (coord.col < minCol) {
-				minCol = coord.col;
-			}
-		}
-		long volume = 0;
-		for (long row = minRow; row <= maxRow; row++) {
-			for (long col = minCol; col <= maxCol; col++) {
-				if (isInsideTrench(trench, new Coordinate(row, col), minRow, minCol)) {
-					volume++;
+
+		private static Direction getDirection(String firstChar) {
+			for (Direction d : Direction.values()) {
+				if (d.name().startsWith(firstChar)) {
+					return d;
 				}
 			}
+			return null;
 		}
-		return String.valueOf(volume);
-	}
 
-	private boolean isInsideTrench(Set<Coordinate> trench, Coordinate coord, long minRow, long minCol) {
-		long crossingPoints = 0;
-		if (trench.contains(coord)) {
-			return true;
-		}
-		Coordinate temp = new Coordinate(coord.row, coord.col);
-		while (temp.row >= minRow && temp.col >= minCol) {
-			if (trench.contains(temp) && !isCorner(trench, temp)) {
-				crossingPoints++;
+		private static Direction getDirection(char lastChar) {
+			switch (lastChar) {
+			case '0':
+				return Direction.RIGHT;
+			case '1':
+				return Direction.DOWN;
+			case '2':
+				return Direction.LEFT;
+			case '3':
+				return Direction.UP;
 			}
-			temp.row--;
-			temp.col--;
+			return null;
 		}
-		return crossingPoints % 2 == 1;
-	}
 
-	private boolean isCorner(Set<Coordinate> trench, Coordinate coord) {
-		return (!trench.contains(new Coordinate(coord.row - 1, coord.col))
-				&& !trench.contains(new Coordinate(coord.row, coord.col + 1)))
-				|| (!trench.contains(new Coordinate(coord.row + 1, coord.col))
-						&& !trench.contains(new Coordinate(coord.row, coord.col - 1)));
-	}
-
-	private Direction getDirection(String firstChar) {
-		for (Direction d : Direction.values()) {
-			if (d.name().startsWith(firstChar)) {
-				return d;
-			}
-		}
-		return null;
 	}
 
 }
