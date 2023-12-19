@@ -3,11 +3,20 @@ package com.noahgeren.adventofcode.util;
 import java.util.Objects;
 
 public class Coordinate {
-	public int row, col;
+	public long row, col;
 
-	public Coordinate(int row, int col) {
+	public Coordinate(long row, long col) {
 		this.row = row;
 		this.col = col;
+	}
+	
+	public Coordinate getNextCoord(Direction direction) {
+		return direction.getNextCoord(this);
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("(%d, %d)", row, col);
 	}
 
 	@Override

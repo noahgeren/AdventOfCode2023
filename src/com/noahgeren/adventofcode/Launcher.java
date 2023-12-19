@@ -4,7 +4,7 @@ public class Launcher {
 
 	private static final String PACKAGE = "xxiii";
 	private static final int YEAR = 2023;
-	private static final int DAY = 17;
+	private static final int DAY = 18;
 	
 	public static void main(String[] args) {
 		try {
@@ -18,7 +18,7 @@ public class Launcher {
 				System.out.printf("Error resetting class for day %d of %d\n", DAY, YEAR);
 				e.printStackTrace();
 			}
-			runPartOfDay(day, false);
+//			runPartOfDay(day, false);
 		} catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
 			System.out.printf("Error loading class for day %d of %d\n", DAY, YEAR);
 			e.printStackTrace();
