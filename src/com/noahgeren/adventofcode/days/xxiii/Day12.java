@@ -1,4 +1,4 @@
-package com.noahgeren.adventofcode.problems.xxiii;
+package com.noahgeren.adventofcode.days.xxiii;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.noahgeren.adventofcode.Day;
 import com.noahgeren.adventofcode.data.DataLoader;
+import com.noahgeren.adventofcode.days.Day;
 
 public class Day12 extends Day {
 

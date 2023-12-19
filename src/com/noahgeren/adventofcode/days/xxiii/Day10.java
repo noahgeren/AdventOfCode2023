@@ -1,4 +1,4 @@
-package com.noahgeren.adventofcode.problems.xxiii;
+package com.noahgeren.adventofcode.days.xxiii;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -7,8 +7,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import com.noahgeren.adventofcode.Day;
 import com.noahgeren.adventofcode.data.DataLoader;
+import com.noahgeren.adventofcode.days.Day;
 
 public class Day10 extends Day {
 

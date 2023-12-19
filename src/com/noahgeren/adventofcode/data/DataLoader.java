@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.noahgeren.adventofcode.Launcher;
+
 public class DataLoader {
 	
 	public static BufferedReader getReader(String name) {
-		return new BufferedReader(new InputStreamReader(DataLoader.class.getResourceAsStream(name)));
+		return new BufferedReader(new InputStreamReader(DataLoader.class.getResourceAsStream(Launcher.PACKAGE + "/" + name)));
 	}
 	
 	public static List<String> readLines(String name) throws IOException {

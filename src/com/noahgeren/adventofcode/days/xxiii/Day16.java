@@ -1,12 +1,12 @@
-package com.noahgeren.adventofcode.problems.xxiii;
+package com.noahgeren.adventofcode.days.xxiii;
 
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import com.noahgeren.adventofcode.Day;
 import com.noahgeren.adventofcode.data.DataLoader;
+import com.noahgeren.adventofcode.days.Day;
 import com.noahgeren.adventofcode.util.Direction;
 
 public class Day16 extends Day {

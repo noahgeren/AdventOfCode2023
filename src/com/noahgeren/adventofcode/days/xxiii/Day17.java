@@ -1,4 +1,4 @@
-package com.noahgeren.adventofcode.problems.xxiii;
+package com.noahgeren.adventofcode.days.xxiii;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import com.noahgeren.adventofcode.Day;
 import com.noahgeren.adventofcode.data.DataLoader;
+import com.noahgeren.adventofcode.days.Day;
 import com.noahgeren.adventofcode.util.Coordinate;
 import com.noahgeren.adventofcode.util.Direction;
 

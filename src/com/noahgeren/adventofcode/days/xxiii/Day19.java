@@ -1,6 +1,6 @@
-package com.noahgeren.adventofcode.problems.xxiii;
+package com.noahgeren.adventofcode.days.xxiii;
 
-import com.noahgeren.adventofcode.Day;
+import com.noahgeren.adventofcode.days.Day;
 
 public class Day19 extends Day {
 

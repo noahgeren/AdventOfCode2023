@@ -1,4 +1,4 @@
-package com.noahgeren.adventofcode;
+package com.noahgeren.adventofcode.days;
 
 public abstract class Day {
 	
