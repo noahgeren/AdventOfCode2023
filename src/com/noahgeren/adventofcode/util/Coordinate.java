@@ -3,15 +3,19 @@ package com.noahgeren.adventofcode.util;
 import java.util.Objects;
 
 public class Coordinate {
-	public long row, col;
+	public int row, col;
 
-	public Coordinate(long row, long col) {
+	public Coordinate(int row, int col) {
 		this.row = row;
 		this.col = col;
 	}
 	
 	public Coordinate getNextCoord(Direction direction) {
 		return direction.getNextCoord(this);
+	}
+	
+	public boolean inBounds(int rows, int cols) {
+		return row >= 0 && col >= 0 && row < rows && col < cols;
 	}
 	
 	@Override
