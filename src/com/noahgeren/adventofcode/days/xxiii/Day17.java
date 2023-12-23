@@ -1,11 +1,9 @@
 package com.noahgeren.adventofcode.days.xxiii;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+import java.util.TreeSet;
 
 import com.noahgeren.adventofcode.data.DataLoader;
 import com.noahgeren.adventofcode.days.Day;
@@ -14,10 +12,7 @@ import com.noahgeren.adventofcode.util.Direction;
 
 public class Day17 extends Day {
 
-	static Map<Direction, Direction[]> leftsAndRights = new HashMap<>();
-
 	long[][] grid;
-	Map<DirectionalCoordinate, Long> cache = new HashMap<>();
 
 	@Override
 	public void loadResources() throws Exception {
@@ -34,80 +29,132 @@ public class Day17 extends Day {
 
 	@Override
 	public String solve(boolean firstPart) throws Exception {
-		// TODO: Switch to Dijkstra's algorithm
-		return String.valueOf(findShortestPath(new int[] { 0, 0 }, new HashSet<>(), Direction.RIGHT, 0) - grid[0][0]);
+		HashSet<ExtraCoordinate> seen = new HashSet<>();
+		TreeSet<ExtraCoordinate> shortestPaths = new TreeSet<>();
+		shortestPaths.add(new ExtraCoordinate(new Coordinate(0, 0), Direction.DOWN, 0, 0));
+		while (!shortestPaths.isEmpty()) {
+			ExtraCoordinate path = shortestPaths.pollFirst();
+			if (seen.contains(path)) {
+				continue;
+			}
+//			System.out.println(path);
+			seen.add(path);
+			if (path.row == grid.length - 1 && path.col == grid[0].length - 1) {
+				if(firstPart || path.stepsInLastDirection > 3) {
+					System.out.println(path);
+					return String.valueOf(path.currentLength - grid[0][0]);
+				}
+			}
+			Coordinate nextCoord;
+			if(firstPart) {
+				if (path.stepsInLastDirection < 3) {
+					nextCoord = path.getNextCoord(path.lastDirection);
+					if (nextCoord.inBounds(grid.length, grid[0].length)) {
+						shortestPaths.add(new ExtraCoordinate(nextCoord, path.lastDirection, path.stepsInLastDirection + 1,
+								path.currentLength));
+					}
+				}
+				if (path.lastDirection == Direction.UP || path.lastDirection == Direction.DOWN) {
+					nextCoord = path.getNextCoord(Direction.LEFT);
+					if (nextCoord.inBounds(grid.length, grid[0].length)) {
+						shortestPaths.add(new ExtraCoordinate(nextCoord, Direction.LEFT, 1, path.currentLength));
+					}
+					nextCoord = path.getNextCoord(Direction.RIGHT);
+					if (nextCoord.inBounds(grid.length, grid[0].length)) {
+						shortestPaths.add(new ExtraCoordinate(nextCoord, Direction.RIGHT, 1, path.currentLength));
+					}
+				} else {
+					nextCoord = path.getNextCoord(Direction.UP);
+					if (nextCoord.inBounds(grid.length, grid[0].length)) {
+						shortestPaths.add(new ExtraCoordinate(nextCoord, Direction.UP, 1, path.currentLength));
+					}
+					nextCoord = path.getNextCoord(Direction.DOWN);
+					if (nextCoord.inBounds(grid.length, grid[0].length)) {
+						shortestPaths.add(new ExtraCoordinate(nextCoord, Direction.DOWN, 1, path.currentLength));
+					}
+				}
+			} else {
+				if(path.stepsInLastDirection < 4) {
+					nextCoord = path.getNextCoord(path.lastDirection);
+					if (nextCoord.inBounds(grid.length, grid[0].length)) {
+						shortestPaths.add(new ExtraCoordinate(nextCoord, path.lastDirection, path.stepsInLastDirection + 1,
+								path.currentLength));
+					}
+				} else {
+					if(path.stepsInLastDirection < 10) {
+						nextCoord = path.getNextCoord(path.lastDirection);
+						if (nextCoord.inBounds(grid.length, grid[0].length)) {
+							shortestPaths.add(new ExtraCoordinate(nextCoord, path.lastDirection, path.stepsInLastDirection + 1,
+									path.currentLength));
+						}
+					}
+					if (path.lastDirection == Direction.UP || path.lastDirection == Direction.DOWN) {
+						nextCoord = path.getNextCoord(Direction.LEFT);
+						if (nextCoord.inBounds(grid.length, grid[0].length)) {
+							shortestPaths.add(new ExtraCoordinate(nextCoord, Direction.LEFT, 1, path.currentLength));
+						}
+						nextCoord = path.getNextCoord(Direction.RIGHT);
+						if (nextCoord.inBounds(grid.length, grid[0].length)) {
+							shortestPaths.add(new ExtraCoordinate(nextCoord, Direction.RIGHT, 1, path.currentLength));
+						}
+					} else {
+						nextCoord = path.getNextCoord(Direction.UP);
+						if (nextCoord.inBounds(grid.length, grid[0].length)) {
+							shortestPaths.add(new ExtraCoordinate(nextCoord, Direction.UP, 1, path.currentLength));
+						}
+						nextCoord = path.getNextCoord(Direction.DOWN);
+						if (nextCoord.inBounds(grid.length, grid[0].length)) {
+							shortestPaths.add(new ExtraCoordinate(nextCoord, Direction.DOWN, 1, path.currentLength));
+						}
+					}
+				}
+			}
+		}
+		return null;
 	}
 
-	private long findShortestPath(int[] coord, Set<Coordinate> seen, Direction lastDirection, int currentLength) {
-		long shortestPath = Integer.MAX_VALUE;
-		int row = coord[0], col = coord[1];
-		Coordinate coordObj = new Coordinate(row, col);
-		if(row == grid.length - 1 && col == grid[0].length - 1) {
-			return grid[row][col];
-		}
-		if (row < 0 || row >= grid.length || col < 0 || col >= grid[row].length || seen.contains(coordObj)) {
-			return shortestPath;
-		}
-		seen = new HashSet<>(seen);
-		seen.add(coordObj);
+	private class ExtraCoordinate extends Coordinate implements Comparable<ExtraCoordinate> {
 
-		DirectionalCoordinate directionalCoord = new DirectionalCoordinate(row, col, lastDirection, currentLength);
-		if (cache.containsKey(directionalCoord)) {
-			return grid[row][col] + cache.get(directionalCoord);
-		}
-
-		// Go straight
-		if (currentLength < 4) {
-			shortestPath = Math.min(shortestPath,
-					findShortestPath(lastDirection.getNextCoord(coord), seen, lastDirection, currentLength + 1));
-		}
-
-		// Turn left or right
-		if (lastDirection == Direction.LEFT || lastDirection == Direction.RIGHT) {
-			shortestPath = Math.min(shortestPath,
-					findShortestPath(Direction.UP.getNextCoord(coord), seen, Direction.UP, 1));
-			shortestPath = Math.min(shortestPath,
-					findShortestPath(Direction.DOWN.getNextCoord(coord), seen, Direction.DOWN, 1));
-		} else {
-			shortestPath = Math.min(shortestPath,
-					findShortestPath(Direction.LEFT.getNextCoord(coord), seen, Direction.LEFT, 1));
-			shortestPath = Math.min(shortestPath,
-					findShortestPath(Direction.RIGHT.getNextCoord(coord), seen, Direction.RIGHT, 1));
-		}
-
-		cache.put(directionalCoord, shortestPath);
-		return grid[row][col] + shortestPath;
-	}
-
-	private static class DirectionalCoordinate extends Coordinate {
 		Direction lastDirection;
-		int currentLength;
+		int stepsInLastDirection;
+		long currentLength;
 
-		public DirectionalCoordinate(int row, int col, Direction lastDirection, int currentLength) {
-			super(row, col);
+		public ExtraCoordinate(Coordinate coord, Direction lastDirection, int stepsInLastDirection,
+				long currentLength) {
+			super(coord.row, coord.col);
 			this.lastDirection = lastDirection;
-			this.currentLength = currentLength;
+			this.stepsInLastDirection = stepsInLastDirection;
+			this.currentLength = currentLength + grid[coord.row][coord.col];
 		}
 
+		@Override
+		public int compareTo(ExtraCoordinate o) {
+			int compare = Long.compare(currentLength, o.currentLength);
+			if (compare != 0) {
+				return compare;
+			}
+			compare = this.hashCode() - o.hashCode();
+			if(compare != 0) {
+				return compare;
+			}
+			compare = this.lastDirection.ordinal() - o.lastDirection.ordinal();
+			if(compare != 0) {
+				return compare;
+			}
+			return this.stepsInLastDirection - o.stepsInLastDirection;
+		}
+		
 		@Override
 		public int hashCode() {
-			final int prime = 31;
-			int result = super.hashCode();
-			result = prime * result + Objects.hash(currentLength, lastDirection);
-			return result;
+			return Objects.hash(super.hashCode(), lastDirection, stepsInLastDirection);
 		}
 
 		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (!super.equals(obj))
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			DirectionalCoordinate other = (DirectionalCoordinate) obj;
-			return currentLength == other.currentLength && lastDirection == other.lastDirection;
+		public String toString() {
+			return "ExtraCoordinate [lastDirection=" + lastDirection + ", stepsInLastDirection=" + stepsInLastDirection
+					+ ", currentLength=" + currentLength + ", row=" + row + ", col=" + col + "]";
 		}
+
 	}
 
 }
