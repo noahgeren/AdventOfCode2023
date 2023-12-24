@@ -6,7 +6,7 @@ public class Launcher {
 
 	public static final String PACKAGE = "xxiii";
 	private static final int YEAR = 2023;
-	private static final int DAY = 17;
+	private static final int DAY = 21;
 	
 	public static void main(String[] args) {
 		try {
